@@ -1,18 +1,16 @@
 package Idea.To.MVP.models;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Entity
 public class CartItem {
     @Id
@@ -20,7 +18,18 @@ public class CartItem {
     private UUID id;
     private Long antal;
     private Long styckPris;
-    private String product;
-    // private cart
-    // varför totalpris här?
+
+    //Totalpris = antal * styckpris
+    private BigDecimal totalPris;
+
+
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
+
 }
