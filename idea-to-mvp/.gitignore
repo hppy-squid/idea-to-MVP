@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Eget
+idea-to-mvp/src/main/resources/application.properties
