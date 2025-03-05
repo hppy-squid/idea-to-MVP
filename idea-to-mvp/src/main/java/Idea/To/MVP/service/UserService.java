@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +21,19 @@ public class UserService {
 
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+
+
+    public List<User> getAllUsers() {
+        List <User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("No users found");
+        }
+        return users;
+    }
+
+    public User getUserById(UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+    }
 
 
     public User createUser(CreateUserReq createUserReq) {

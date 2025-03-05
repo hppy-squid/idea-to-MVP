@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import Idea.To.MVP.models.User;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -24,7 +25,7 @@ public class UserController {
 
     private final UserService userService;
 
-      @GetMapping("/testUser")
+    @GetMapping("/testUser")
     public ResponseEntity<User> getTestUser() {
 
         User user = new User();
@@ -32,6 +33,32 @@ public class UserController {
 
         return ResponseEntity.ok(user); 
     }
+
+    @GetMapping("/users/find")
+    public ResponseEntity<ApiResponse> getAllUsers() {
+        try {
+            List<User> users = userService.getAllUsers();
+            List <UserDto> userDtos = users.stream()
+                    .map(userService :: convertToDto)
+                    .toList();
+            return ResponseEntity.ok(new ApiResponse("Users found successfully", true, userDtos));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), false, null));
+        }
+    }
+
+    @GetMapping ("/users/find/{id}")
+    public ResponseEntity<ApiResponse> getUserById(@PathVariable("id") UUID id) {
+        try {
+            User user = userService.getUserById(id);
+            UserDto userDto = userService.convertToDto(user);
+            return ResponseEntity.ok(new ApiResponse("User found successfully", true, userDto));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), false, null));
+        }
+    }
+
+
 
     @PostMapping("/users/add")
     public ResponseEntity<ApiResponse> createNewUser(@RequestBody CreateUserReq req) {
