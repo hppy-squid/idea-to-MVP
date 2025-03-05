@@ -16,11 +16,11 @@ public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private Long antal;
-    private Long styckPris;
+    private Long amount;
+    private Long unitPrice;
 
     //Totalpris = antal * styckpris
-    private BigDecimal totalPris;
+    private BigDecimal totalPrice;
 
 
 

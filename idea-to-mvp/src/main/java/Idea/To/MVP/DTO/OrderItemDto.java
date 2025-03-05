@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Data
 public class OrderItemDto {
-    private UUID id;
-    private Long antal;
+    private UUID orderItemId;
+    private Long amount;
     private BigDecimal price;
 }

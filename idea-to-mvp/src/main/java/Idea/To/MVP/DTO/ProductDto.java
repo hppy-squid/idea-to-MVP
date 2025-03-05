@@ -8,12 +8,12 @@ import java.util.UUID;
 
 @Data
 public class ProductDto {
-   private UUID id;
+   private UUID productId;
    private String stripeId;
-   private String pris;
-   private String name;
-   private boolean lagerstatus;
-   private String bild;
-   private String beskrivning;
-   private String land;
+   private String price;
+   private String productName;
+   private boolean inStock;
+   private String image;
+   private String description;
+   private String originCountry;
 }

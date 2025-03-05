@@ -7,10 +7,10 @@ import java.util.UUID;
 
 @Data
 public class CartItemDto {
-    private UUID id;
-    private Long antal;
-    private Long styckPris;
-    private BigDecimal totalPris;
+    private UUID cartItemId;
+    private Long amount;
+    private Long unitPrice;
+    private BigDecimal totalPrice;
 
     private ProductDto product;
 }

@@ -20,9 +20,9 @@ public class Product {
     private String stripeId;
     private String name;
     private String pris;
-    private boolean lagerstatus;
-    private String bild;
-    private String beskrivning;
-    private String land;
+    private boolean inStock;
+    private String image;
+    private String description;
+    private String originCountry;
 
 }
