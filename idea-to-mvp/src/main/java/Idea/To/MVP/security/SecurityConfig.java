@@ -21,9 +21,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
 }
