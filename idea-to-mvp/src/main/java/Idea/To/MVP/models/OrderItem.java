@@ -16,8 +16,8 @@ public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private Long antal;
-    private BigDecimal pris;
+    private Long amount;
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

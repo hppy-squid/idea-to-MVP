@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 public class CartDto {
-    private UUID id;
-    private BigDecimal totalBelopp;
+    private UUID cartId;
+    private BigDecimal totalPrice;
     private List<CartItemDto> cartItems;
 }
