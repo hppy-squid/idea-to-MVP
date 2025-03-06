@@ -47,7 +47,7 @@ public class ProductController {
         productService.addProduct(product);
     }
 
-    @GetMapping("/products")
+    @GetMapping("/allProduct")
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
@@ -62,8 +62,8 @@ public class ProductController {
         return productService.deleteProductById(id);
     }
 
-    // @PatchMapping("/product/{id}")
-    // public void patchProductById(@PathVariable("id") UUID id) {
-    //     productService.patchProductById();
-    // }
+    @PatchMapping("/product")
+    public Optional<Product> patchProductById(@RequestParam("id") UUID id, @RequestBody Product product) {
+        return productService.patchProductById(id, product);
+    }
 }

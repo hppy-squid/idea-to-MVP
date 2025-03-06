@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.stripe.Stripe;
 import com.stripe.model.checkout.Session;
@@ -17,6 +18,7 @@ import com.stripe.param.checkout.SessionCreateParams;
 import Idea.To.MVP.Repository.ProductRepository;
 import Idea.To.MVP.models.Product;
 
+@Transactional
 @Service
 public class ProductService {
 
@@ -87,13 +89,30 @@ public class ProductService {
                 return "Id finns inte";
         }
 
-        // Börja här 
 
-        // public Optional<Product> patchProductById(UUID id, Product product) {
-        //         Optional<Product> optionalProduct = Optional.of(product);
-        //         optionalProduct = productRepository.findById(id);
-
-        //         return 
-
-        // }
+        public Optional<Product> patchProductById(UUID id, Product product) {
+                
+                      return productRepository.findById(id)
+                      .map(existingProduct -> {
+                        if (product.getName() != null) {
+                                existingProduct.setName(product.getName());
+                                }      
+                        if (product.getPrice() != null) {
+                                existingProduct.setPrice(product.getPrice());
+                                        }
+                        if (product.isInStock() != existingProduct.isInStock()) {
+                                existingProduct.setInStock(product.isInStock());
+                                }  
+                        if (product.getDescription() != null) {
+                                existingProduct.setDescription(product.getDescription());
+                                                        } 
+                        if (product.getOriginCountry() != null) {
+                                existingProduct.setOriginCountry(product.getOriginCountry());
+                                }
+                        if (product.getImage() != null) {
+                                existingProduct.setImage(product.getImage());
+                                }                                    
+                        return productRepository.save(existingProduct);
+                });  
+        }
 }
