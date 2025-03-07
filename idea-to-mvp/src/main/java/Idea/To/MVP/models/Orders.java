@@ -17,6 +17,7 @@ import lombok.*;
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "order_id")
     private UUID orderId;
     private Date orderDate;
     private Long totalAmount;
