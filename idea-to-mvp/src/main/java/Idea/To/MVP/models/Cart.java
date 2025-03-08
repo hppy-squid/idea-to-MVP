@@ -25,4 +25,21 @@ public class Cart {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public void clearCart() {
+        this.cartItems.clear();
+        updateTotalPrice();
+    }
+
+    private void updateTotalPrice() {
+        this.totalPrice = this.cartItems.stream()
+                .map(item -> {
+                    BigDecimal unitPrice = item.getUnitPrice();
+
+                    if (unitPrice == null) {
+                        return BigDecimal.ZERO;
+                    }
+                    return unitPrice.multiply(BigDecimal.valueOf(item.getAmount()));
+                }).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
 }
