@@ -1,5 +1,6 @@
 package Idea.To.MVP.models;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -22,7 +23,7 @@ public class Product {
     private UUID id;
     private String stripeId;
     private String name;
-    private String price;
+    private BigDecimal price;
     private boolean inStock;
     private String image;
     private String description;
