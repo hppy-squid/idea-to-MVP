@@ -68,22 +68,24 @@ public class StripeProductService {
         List<Product> products = productRepository.findAll();
         for (Product product : products) {
 
-            try {
-                ProductCreateParams params = ProductCreateParams.builder()
-                        .setName(product.getName())
-                        .setDescription(product.getDescription())
-                        .putMetadata("id", String.valueOf(product.getId()))
-                        .build();
-
-                com.stripe.model.Product stripeProduct = com.stripe.model.Product.create(params);
-                product.setStripeId(stripeProduct.getId());
-                productRepository.save(product);
-            } catch (StripeException e) {
-                // Hantera fel, t.ex. logga problemet
-                System.err.println("Fel vid uppladdning av produkt: " + product.getName());
-                e.printStackTrace();
+            if (product.getStripeId() == null || product.getStripeId().isEmpty()) {
+                try {
+                    ProductCreateParams params = ProductCreateParams.builder()
+                            .setName(product.getName())
+                            .setDescription(product.getDescription())
+                            .putMetadata("id", String.valueOf(product.getId()))
+                            .build();
+    
+                    com.stripe.model.Product stripeProduct = com.stripe.model.Product.create(params);
+                    product.setStripeId(stripeProduct.getId());
+                    productRepository.save(product);
+                } catch (StripeException e) {
+                    // Hantera fel, t.ex. logga problemet
+                    System.err.println("Fel vid uppladdning av produkt: " + product.getName());
+                    e.printStackTrace();
+                }
             }
-        }
+         }
     }
 
     //Måste fixa loopen så den bara lägger till objektet en gång. HÄR VI ÄR NU->->><<<--------------------------------------------------------------------------------------------------------
