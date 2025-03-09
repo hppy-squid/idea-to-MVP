@@ -41,7 +41,7 @@ public class CartService {
        }
        return carts;
     }
-
+    @Transactional
     public void clearCart(UUID id) {
         Cart cart = getCartById(id);
         cartItemRepository.deleteAllByCartId(id);
