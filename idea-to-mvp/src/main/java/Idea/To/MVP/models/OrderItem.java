@@ -10,7 +10,6 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class OrderItem {
     @Id
@@ -26,4 +25,11 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    public OrderItem(Orders order, Product product, long amount, BigDecimal price) {
+        this.order = order;
+        this.product = product;
+        this.amount = amount;
+        this.price = price;
+    }
 }

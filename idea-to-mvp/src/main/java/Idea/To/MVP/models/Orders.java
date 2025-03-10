@@ -1,9 +1,11 @@
 package Idea.To.MVP.models;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import Idea.To.MVP.Enum.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +13,6 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "orders")
 public class Orders {
@@ -20,8 +21,11 @@ public class Orders {
     @Column(name = "order_id")
     private UUID orderId;
     private Date orderDate;
-    private Long totalAmount;
-    private String orderStatus;
+    private BigDecimal totalAmount;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    private String stripeSessionId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -29,4 +33,5 @@ public class Orders {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
+
 }
