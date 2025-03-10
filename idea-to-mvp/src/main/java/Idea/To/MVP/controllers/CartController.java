@@ -9,8 +9,8 @@ import Idea.To.MVP.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +54,32 @@ public class CartController {
             return ResponseEntity.ok(new ApiResponse("Carts found successfully", true, cartDto));
         } catch (CartNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), false, null));
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse> clearCart(@PathVariable("id") String uuid) {
+        try {
+            UUID id = UUID.fromString(uuid);
+            cartService.clearCart(id);
+            return ResponseEntity.ok(new ApiResponse("Cart cleared successfully", true, null));
+        } catch (CartNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), false, null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse("Id is to large or too small", false, null));
+        }
+    }
+
+    @GetMapping("/get/total/{id}")
+    public ResponseEntity<ApiResponse> getTotalPrice(@PathVariable("id") String uuid) {
+        try {
+            UUID id = UUID.fromString(uuid);
+            BigDecimal totalPrice = cartService.getTotalPrice(id);
+            return ResponseEntity.ok(new ApiResponse("Total price found successfully", true, totalPrice));
+        } catch (CartNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), false, null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse("Id is to large or too small", false, null));
         }
     }
 }

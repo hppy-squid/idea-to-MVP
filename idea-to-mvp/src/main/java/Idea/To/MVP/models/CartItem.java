@@ -17,7 +17,7 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private Long amount;
-    private Long unitPrice;
+    private BigDecimal unitPrice;
 
     //Totalpris = antal * styckpris
     private BigDecimal totalPrice;
@@ -31,5 +31,9 @@ public class CartItem {
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
+
+    public void setTotalPrice() {
+        this.totalPrice = this.unitPrice.multiply(new BigDecimal(amount));
+    }
 
 }

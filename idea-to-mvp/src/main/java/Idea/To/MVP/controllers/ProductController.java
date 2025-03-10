@@ -1,5 +1,6 @@
 package Idea.To.MVP.controllers;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,5 +66,18 @@ public class ProductController {
     @PatchMapping("/product")
     public Optional<Product> patchProductById(@RequestParam("id") UUID id, @RequestBody Product product) {
         return productService.patchProductById(id, product);
+    }
+    @PostMapping("/addTestProduct")
+    public ResponseEntity<Product> addTestProduct() {
+        Product product = new Product();
+        product.setName("Test Produkt");
+        product.setPrice(new BigDecimal(299));
+        product.setInStock(true);
+        product.setDescription("Detta är en test produkt");
+        product.setOriginCountry("Sweden");
+        product.setImage(null);
+
+        productService.addProduct(product);
+        return ResponseEntity.ok(product);
     }
 }
