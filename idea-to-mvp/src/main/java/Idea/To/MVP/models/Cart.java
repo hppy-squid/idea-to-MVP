@@ -33,6 +33,12 @@ public class Cart {
 
     }
 
+    public void deleteItem(CartItem item) {
+        this.cartItems.remove(item);
+        item.setCart(null);
+        updateTotalPrice();
+    }
+
     public void clearCart() {
         this.cartItems.clear();
         updateTotalPrice();

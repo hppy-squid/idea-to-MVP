@@ -1,5 +1,6 @@
 package Idea.To.MVP.service;
 
+import Idea.To.MVP.Exceptions.CartItemNotFoundException;
 import Idea.To.MVP.Repository.CartItemRepository;
 import Idea.To.MVP.Repository.CartRepository;
 import Idea.To.MVP.models.Cart;
@@ -47,5 +48,39 @@ public class CartItemService {
         }
 
     }
+
+    private CartItem getCartItem(UUID cartId, UUID productId) {
+        Cart cart = cartService.getCartById(cartId);
+        return cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new CartItemNotFoundException("This item has not been found"));
+    }
+
+    public void removeItemFromCart (UUID cartId, UUID productId) {
+        Cart cart = cartService.getCartById(cartId);
+        CartItem item = getCartItem(cartId, productId);
+        cart.deleteItem(item);
+        cartRepository.save(cart);
+    }
+
+    public void updateAmount (UUID cartId, UUID productId, long amount) {
+        Cart cart = cartService.getCartById(cartId);
+        cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .ifPresent(item -> {
+                    item.setAmount(amount);
+                    item.setUnitPrice(item.getProduct().getPrice());
+                    item.setTotalPrice();
+                });
+        BigDecimal totalPriceOfCart = cart.getCartItems().stream()
+                .map(CartItem::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        cart.setTotalPrice(totalPriceOfCart);
+        cartRepository.save(cart);
+    }
+
+
 
 }
