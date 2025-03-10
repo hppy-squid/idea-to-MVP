@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,40 +28,38 @@ public class StripeProductService {
     @Value("${stripe.secret.key}")
     private String secretKey;
 
-    // Metoden tömmer hela Stripe katalogen, finns ingen funktion på Stripe.
 
-    // @PostConstruct
-    // public void clearStripeCatalog() {
-    // // Sätt API-nyckeln för Stripe
-    // Stripe.apiKey = secretKey;
+    public void removeUnusedProductsFromStripe() {
+        // Sätt API-nyckeln för Stripe
+        Stripe.apiKey = secretKey;
 
-    // // Skapa parametrar, t.ex. ange ett maxantal om det behövs
-    // Map<String, Object> params = new HashMap<>();
-    // params.put("limit", 100); // justera vid behov
+        // Skapa parametrar, t.ex. ange ett maxantal om det behövs
+        Map<String, Object> params = new HashMap<>();
 
-    // try {
-    // // Hämta produktlistan från Stripe
-    // com.stripe.model.ProductCollection productCollection =
-    // com.stripe.model.Product.list(params);
+        try {
+            // Hämta produktlistan från Stripe
+            com.stripe.model.ProductCollection productCollection = com.stripe.model.Product.list(params);
 
-    // // Iterera igenom alla produkter och radera dem
-    // productCollection.getData().forEach(product -> {
-    // try {
-    // product.delete();
-    // System.out.println("Raderade produkt: " + product.getId());
-    // } catch (StripeException e) {
-    // System.err.println("Kunde inte radera produkt: " + product.getId());
-    // e.printStackTrace();
-    // }
-    // });
-    // } catch (StripeException e) {
-    // System.err.println("Fel vid hämtning av Stripe produkter: " +
-    // e.getMessage());
-    // e.printStackTrace();
-    // }
-    // }
+            // Iterera igenom alla produkter och radera dem
+            productCollection.getData().forEach(product -> {
 
-    
+                if (!productRepository.findAllById(List.of(UUID.fromString(product.getMetadata().get("id")))).iterator().hasNext()) {
+                    try {
+                        product.delete();
+                    }
+                    
+                    catch (StripeException e) {
+                       System.err.println("Kunde inte radera produkt : " + product.getId());
+                   }
+                }
+            });            
+        } 
+        catch (StripeException e) {
+            System.err.println("Fel vid hämtning av Stripe produkter: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     @PostConstruct
     public void uploadProductsToStripe() {
 
@@ -75,7 +74,7 @@ public class StripeProductService {
                             .setDescription(product.getDescription())
                             .putMetadata("id", String.valueOf(product.getId()))
                             .build();
-    
+
                     com.stripe.model.Product stripeProduct = com.stripe.model.Product.create(params);
                     product.setStripeId(stripeProduct.getId());
                     productRepository.save(product);
@@ -85,11 +84,11 @@ public class StripeProductService {
                     e.printStackTrace();
                 }
             }
-         }
+        }
+        fetchProductsFromStripe();
     }
 
-    //Måste fixa loopen så den bara lägger till objektet en gång. HÄR VI ÄR NU->->><<<--------------------------------------------------------------------------------------------------------
-    @PostConstruct
+
     public void fetchProductsFromStripe() {
         // Sätt API-nyckeln
         Stripe.apiKey = secretKey;
@@ -106,6 +105,8 @@ public class StripeProductService {
                 // Här kan du t.ex. skriva ut produktens namn och id
                 List<String> metadataValues = new ArrayList<>(stripeProduct.getMetadata().values());
                 stripeProductIds.addAll(metadataValues);
+                // här tar vi bort produkter efter ID:s som inte finns
+                removeUnusedProductsFromStripe();
 
                 System.out.println("Stripe produkt hittad: " + stripeProduct.getName() + " (ID: "
                         + stripeProduct.getId() + ")" + stripeProductIds);
