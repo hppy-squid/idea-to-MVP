@@ -19,6 +19,8 @@ public class Cart {
     private UUID id;
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
+    private String stripeSessionId;
+
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
 
@@ -31,6 +33,12 @@ public class Cart {
         item.setCart(this);
         updateTotalPrice();
 
+    }
+
+    public void deleteItem(CartItem item) {
+        this.cartItems.remove(item);
+        item.setCart(null);
+        updateTotalPrice();
     }
 
     public void clearCart() {
