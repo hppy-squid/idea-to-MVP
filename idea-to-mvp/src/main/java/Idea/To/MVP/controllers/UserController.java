@@ -29,7 +29,7 @@ public class UserController {
     public ResponseEntity<User> getTestUser() {
 
         User user = new User();
-        user.setUserName("test");
+        user.setFirstName("test");
 
         return ResponseEntity.ok(user); 
     }

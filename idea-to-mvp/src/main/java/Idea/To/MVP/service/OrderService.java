@@ -88,7 +88,7 @@ public class OrderService {
     }
 
     public List<OrdersDto> getAUsersOrders (UUID userId) {
-        List<Orders> orders = ordersRepository.findUserById(userId);
+        List<Orders> orders = ordersRepository.findByUserId(userId);
         return orders.stream().map(this :: convertToDto).toList();
     }
 

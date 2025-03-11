@@ -9,7 +9,7 @@ import Idea.To.MVP.models.Orders;
 
 public interface OrdersRepository extends JpaRepository<Orders, UUID> {
 
-    List<Orders> findUserById(UUID userId);
+    List<Orders> findByUserId(UUID userId);
 
     Optional<Orders> findByStripeSessionId(String stripeSessionId);
 }

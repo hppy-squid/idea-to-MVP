@@ -1,9 +1,7 @@
 package Idea.To.MVP.DTO;
 
 import lombok.Data;
-import lombok.Value;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @Data

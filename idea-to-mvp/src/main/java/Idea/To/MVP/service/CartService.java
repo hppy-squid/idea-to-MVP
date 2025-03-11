@@ -6,7 +6,6 @@ import Idea.To.MVP.Exceptions.CartNotFoundException;
 import Idea.To.MVP.Repository.CartItemRepository;
 import Idea.To.MVP.Repository.CartRepository;
 import Idea.To.MVP.models.Cart;
-import Idea.To.MVP.models.CartItem;
 import Idea.To.MVP.models.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
