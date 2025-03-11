@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -51,7 +50,7 @@ public class OrderController {
         try {
             List<OrdersDto> ordersDto = orderService.getAUsersOrders(userId);
             return ResponseEntity.ok(new ApiResponse("All orders for the user "
-                    + userService.getUserById(userId).getUserName()
+                    + userService.getUserById(userId).getFirstName()
                     + " has been retrieved",
                     true, ordersDto));
         } catch (OrderNotFoundException e) {

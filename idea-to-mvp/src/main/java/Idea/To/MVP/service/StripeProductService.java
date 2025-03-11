@@ -1,5 +1,6 @@
 package Idea.To.MVP.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,15 +70,25 @@ public class StripeProductService {
 
             if (product.getStripeId() == null || product.getStripeId().isEmpty()) {
                 try {
+                    if (product.getPrice() != null) {                     
+                        long priceInSmallestUnit = product.getPrice()
+                    .multiply(new BigDecimal("100"))
+                    .longValueExact();
                     ProductCreateParams params = ProductCreateParams.builder()
                             .setName(product.getName())
                             .setDescription(product.getDescription())
-                            .putMetadata("id", String.valueOf(product.getId()))
+                            .setDefaultPriceData(
+                         ProductCreateParams.DefaultPriceData.builder()
+                         .setCurrency("sek")        
+                         .setUnitAmount(priceInSmallestUnit)
+                             .build()
+                            )
+                    .putMetadata("id", String.valueOf(product.getId()))
                             .build();
 
                     com.stripe.model.Product stripeProduct = com.stripe.model.Product.create(params);
                     product.setStripeId(stripeProduct.getId());
-                    productRepository.save(product);
+                    productRepository.save(product);}
                 } catch (StripeException e) {
                     // Hantera fel, t.ex. logga problemet
                     System.err.println("Fel vid uppladdning av produkt: " + product.getName());

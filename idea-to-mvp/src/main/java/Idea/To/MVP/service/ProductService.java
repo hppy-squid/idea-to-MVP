@@ -1,19 +1,12 @@
 package Idea.To.MVP.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.stripe.Stripe;
-import com.stripe.model.checkout.Session;
-import com.stripe.param.checkout.SessionCreateParams;
 
 import Idea.To.MVP.Repository.ProductRepository;
 import Idea.To.MVP.models.Product;

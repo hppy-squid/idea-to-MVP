@@ -40,7 +40,8 @@ public class UserService {
         return Optional.of(createUserReq).filter(user ->!userRepository.existsByEmail(user.getEmail()))
                 .map(createUserRequest -> {
                     User user = new User();
-                    user.setUserName(createUserReq.getUsername());
+                    user.setFirstName(createUserReq.getFirstName());
+                    user.setLastName(createUserReq.getLastName());
                     user.setPassword(createUserReq.getPassword());
                     user.setEmail(createUserReq.getEmail());
                     return userRepository.save(user);
