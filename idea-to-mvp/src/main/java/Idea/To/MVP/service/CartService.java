@@ -23,11 +23,14 @@ public class CartService {
    private final CartRepository cartRepository;
    private final CartItemRepository cartItemRepository;
    private final ModelMapper modelMapper;
+    private final UserService userService;
 
-   public Cart newCart() {
-      Cart cart = new Cart();
-      cart.setCartItems(new ArrayList<>());
-      return cartRepository.save(cart);
+    public Cart newCart(UUID userId) {
+        User user = userService.getUserById(userId);
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cart.setCartItems(new ArrayList<>());
+        return cartRepository.save(cart);
    }
 
    public Cart getCartById(UUID id) {

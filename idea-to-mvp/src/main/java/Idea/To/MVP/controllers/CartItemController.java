@@ -4,8 +4,10 @@ import Idea.To.MVP.Exceptions.CartItemNotFoundException;
 import Idea.To.MVP.Exceptions.CartNotFoundException;
 import Idea.To.MVP.Response.ApiResponse;
 import Idea.To.MVP.models.Cart;
+import Idea.To.MVP.models.User;
 import Idea.To.MVP.service.CartItemService;
 import Idea.To.MVP.service.CartService;
+import Idea.To.MVP.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +22,15 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class CartItemController {
     private final CartItemService cartItemService;
     private final CartService cartService;
+    private final UserService userService;
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addToCart(@RequestParam UUID productId, @RequestParam(required = false) UUID cartId, @RequestParam Long amount) {
+    public ResponseEntity<ApiResponse> addToCart(@RequestParam UUID productId, @RequestParam(required = false) UUID cartId,
+                                                 @RequestParam Long amount, @RequestParam UUID userId) {
         try {
-            //Detta måste ändras sen då vi kommer att ha autentiserade användare och gästanvändare
+            //Detta måste ändras sen då vi kommer att ha autentiserade användare
             if (cartId == null) {
-                Cart cart = cartService.newCart();
+                Cart cart = cartService.newCart(userId);
                 cartId = cart.getId();
             }
             cartItemService.addProductToCart(cartId,productId,amount);

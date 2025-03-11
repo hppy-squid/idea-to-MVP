@@ -4,6 +4,7 @@ import Idea.To.MVP.DTO.CartDto;
 import Idea.To.MVP.Exceptions.CartNotFoundException;
 import Idea.To.MVP.Response.ApiResponse;
 import Idea.To.MVP.models.Cart;
+import Idea.To.MVP.models.User;
 import Idea.To.MVP.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,8 @@ public class CartController {
     //Detta är bara för att testa att det fungerar. Cart kommer att skapas egentligen när vi skapar ett cart item
     //I CartItemController
     @PostMapping("/new")
-    public Cart newCartTest() {
-        return cartService.newCart();
+    public Cart newCartTest(UUID userId) {
+        return cartService.newCart(userId);
     }
 
     @GetMapping("/get/{id}")
