@@ -1,12 +1,12 @@
 package Idea.To.MVP.controllers;
 
+import java.io.IOException;
 import java.util.UUID;
 
+import com.stripe.exception.StripeException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import Idea.To.MVP.service.StripeCheckoutService;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +27,11 @@ public class CheckoutController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/checkout/success")
+    public void handleSuccess(@RequestParam("session_id") String sessionId, HttpServletResponse response) throws StripeException, IOException {
+        String receiptUrl = stripeCheckoutService.getReceiptUrl(sessionId);
+        response.sendRedirect(receiptUrl);
     }
 }

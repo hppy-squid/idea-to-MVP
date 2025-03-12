@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.stripe.model.Charge;
+import com.stripe.model.PaymentIntent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +70,7 @@ public class StripeCheckoutService {
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .addAllLineItem(lineItems)
                     .setCustomer(user.getStripeId())
-                    .setSuccessUrl("https://dinwebbplats.com/success") 
+                    .setSuccessUrl("http://localhost:8080/api/v1/checkout/success?session_id={CHECKOUT_SESSION_ID}")
                     .setCancelUrl("https://dinwebbplats.com/cancel")
                     .build();
     
@@ -80,6 +82,18 @@ public class StripeCheckoutService {
     
             return session.getUrl(); // Returnera URL till Stripe Checkout
         }
+
+    public String getReceiptUrl(String sessionId) throws StripeException {
+        Stripe.apiKey = secretKey;
+
+        Session session = Session.retrieve(sessionId);
+        String paymentIntentId = session.getPaymentIntent();
+        PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
+        Charge charge = Charge.retrieve(paymentIntent.getLatestCharge());
+
+        return charge.getReceiptUrl();
+    }
+
 }
 
 
