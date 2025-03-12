@@ -3,7 +3,7 @@ package Idea.To.MVP.controllers;
 import Idea.To.MVP.DTO.UserDto;
 import Idea.To.MVP.Exceptions.UserAlreadyExistException;
 import Idea.To.MVP.Exceptions.UserNotFoundException;
-import Idea.To.MVP.Request.CreateUserReq;
+import Idea.To.MVP.request.CreateUserReq;
 import Idea.To.MVP.Response.ApiResponse;
 import Idea.To.MVP.service.UserService;
 import lombok.RequiredArgsConstructor;

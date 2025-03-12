@@ -5,10 +5,11 @@ import Idea.To.MVP.DTO.UserDto;
 import Idea.To.MVP.Exceptions.UserAlreadyExistException;
 import Idea.To.MVP.Exceptions.UserNotFoundException;
 import Idea.To.MVP.Repository.UserRepository;
-import Idea.To.MVP.Request.CreateUserReq;
+import Idea.To.MVP.request.CreateUserReq;
 import Idea.To.MVP.models.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public class UserService {
 
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+    private final PasswordEncoder bcryptEncoder;
+
 
 
     public List<User> getAllUsers() {
@@ -42,7 +45,7 @@ public class UserService {
                     User user = new User();
                     user.setFirstName(createUserReq.getFirstName());
                     user.setLastName(createUserReq.getLastName());
-                    user.setPassword(createUserReq.getPassword());
+                    user.setPassword(bcryptEncoder.encode(createUserReq.getPassword()));
                     user.setEmail(createUserReq.getEmail());
                     return userRepository.save(user);
                 }).orElseThrow(() -> new UserAlreadyExistException("There is already a user with this: " + createUserReq.getEmail() + " email"));

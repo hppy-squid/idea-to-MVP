@@ -1,4 +1,4 @@
-package Idea.To.MVP.Request;
+package Idea.To.MVP.request;
 
 import lombok.Data;
 
