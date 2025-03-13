@@ -28,5 +28,6 @@ public class Product {
     private String image;
     private String description;
     private String originCountry;
+    private String roastLevel;
 
 }

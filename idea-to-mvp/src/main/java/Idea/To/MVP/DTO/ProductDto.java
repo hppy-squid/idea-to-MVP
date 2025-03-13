@@ -14,4 +14,6 @@ public class ProductDto {
    private String image;
    private String description;
    private String originCountry;
+   private String roastLevel;
+
 }
