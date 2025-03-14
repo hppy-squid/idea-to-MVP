@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,9 +23,24 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(nullable = false, length = 20)
     private String firstName;
+
+    @Column(nullable = false, length = 40)
     private String lastName;
+
+
+    @Column(nullable = false)
+    @Size(min = 4)
     private String password;
+
+    @Column(nullable = false, unique = true)
+    @Email(
+            regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",
+            flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "Please enter a correct email adress"
+    )
     private String email;
     private String stripeId;
 
