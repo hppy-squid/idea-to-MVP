@@ -5,11 +5,13 @@ import Idea.To.MVP.DTO.UserDto;
 import Idea.To.MVP.Exceptions.UserAlreadyExistException;
 import Idea.To.MVP.Exceptions.UserNotFoundException;
 import Idea.To.MVP.Repository.UserRepository;
-import Idea.To.MVP.Request.CreateUserReq;
+import Idea.To.MVP.request.CreateUserReq;
 import Idea.To.MVP.models.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,10 +19,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService{
 
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     public List<User> getAllUsers() {
@@ -42,7 +45,7 @@ public class UserService {
                     User user = new User();
                     user.setFirstName(createUserReq.getFirstName());
                     user.setLastName(createUserReq.getLastName());
-                    user.setPassword(createUserReq.getPassword());
+                    user.setPassword(passwordEncoder.encode(createUserReq.getPassword()));
                     user.setEmail(createUserReq.getEmail());
                     return userRepository.save(user);
                 }).orElseThrow(() -> new UserAlreadyExistException("There is already a user with this: " + createUserReq.getEmail() + " email"));
@@ -53,6 +56,22 @@ public class UserService {
             throw new UserNotFoundException("User with id: " + id + " not found");
         });
     }
+
+    @Transactional(readOnly = true)
+    public User authenticateUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+
+        if (user.getOrders() != null) {
+            user.getOrders().size();
+        }
+        if (user.getCart() != null) {
+            user.getCart().getId();
+        }
+
+        return user;
+    }
+
 
     public UserDto convertToDto(User user) {
         return modelMapper.map(user, UserDto.class);
