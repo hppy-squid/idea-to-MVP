@@ -91,13 +91,14 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/users/delete/{id}")
-    public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") UUID id) {
+    @DeleteMapping("/users/delete/{userId}")
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable UUID userId) {
         try {
-            userService.deleteUser(id);
+            userService.deleteUser(userId);
             return ResponseEntity.ok(new ApiResponse("User deleted successfully", true, null));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), false, null));
         }
     }
 }
+

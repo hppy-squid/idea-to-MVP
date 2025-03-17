@@ -78,6 +78,7 @@ public class UserService{
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
     }
 
+    @Transactional
     public void deleteUser(UUID id) {
         userRepository.findById(id).ifPresentOrElse(userRepository :: delete, () -> {
             throw new UserNotFoundException("User with id: " + id + " not found");
