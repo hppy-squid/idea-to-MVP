@@ -7,6 +7,7 @@ import Idea.To.MVP.Exceptions.UserNotFoundException;
 import Idea.To.MVP.Repository.UserRepository;
 import Idea.To.MVP.request.CreateUserReq;
 import Idea.To.MVP.models.User;
+import Idea.To.MVP.request.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,6 +50,31 @@ public class UserService{
                     user.setEmail(createUserReq.getEmail());
                     return userRepository.save(user);
                 }).orElseThrow(() -> new UserAlreadyExistException("There is already a user with this: " + createUserReq.getEmail() + " email"));
+    }
+
+    public User updateUser(UUID userId, UpdateUserRequest updateUserRequest) {
+        return userRepository.findById(userId)
+                .map(user -> {
+                    if (updateUserRequest.getEmail() != null &&
+                        !updateUserRequest.getEmail().equals(user.getEmail()) &&
+                        userRepository.existsByEmail(updateUserRequest.getEmail())) {
+                        throw new UserAlreadyExistException("Email already in use: " + updateUserRequest.getEmail());
+                    }
+                    if (updateUserRequest.getEmail() != null) {
+                        user.setEmail(updateUserRequest.getEmail());
+                    }
+                    if (updateUserRequest.getFirstName() != null) {
+                        user.setFirstName(updateUserRequest.getFirstName());
+                    }
+                    if (updateUserRequest.getLastName() != null) {
+                        user.setLastName(updateUserRequest.getLastName());
+                    }
+                    if (updateUserRequest.getPassword() != null) {
+                        user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
+                    }
+                    return userRepository.save(user);
+                })
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
     }
 
     public void deleteUser(UUID id) {
