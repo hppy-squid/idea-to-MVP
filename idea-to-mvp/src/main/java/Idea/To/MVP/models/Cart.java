@@ -20,7 +20,7 @@ public class Cart {
 
     private String stripeSessionId;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<CartItem> cartItems;
 
     @OneToOne
