@@ -8,6 +8,8 @@ import Idea.To.MVP.Repository.CartRepository;
 import Idea.To.MVP.models.Cart;
 import Idea.To.MVP.models.User;
 import lombok.RequiredArgsConstructor;
+
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +35,11 @@ public class CartService {
         return cartRepository.save(cart);
    }
 
-   public Cart getCartById(UUID id) {
-        return cartRepository.findById(id).orElseThrow(() -> new CartNotFoundException("Cart with id: " + id + " not found"));
-    }
+   @Transactional
+public Cart getCartById(UUID id) {
+    return cartRepository.findCartWithItemsById(id)
+        .orElseThrow(() -> new CartNotFoundException("Cart with id: " + id + " not found"));
+}
 
     public List<Cart> getAllCarts() {
        List<Cart> carts = cartRepository.findAll();
@@ -63,7 +67,9 @@ public class CartService {
         return cart.getTotalPrice();
     }
 
+    @Transactional
     public CartDto convertToDto(Cart cart) {
+        Hibernate.initialize(cart.getCartItems());
         return modelMapper.map(cart, CartDto.class);
     }
 

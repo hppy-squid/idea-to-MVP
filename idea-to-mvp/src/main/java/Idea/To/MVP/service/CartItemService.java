@@ -7,6 +7,7 @@ import Idea.To.MVP.models.Cart;
 import Idea.To.MVP.models.CartItem;
 import Idea.To.MVP.models.Product;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -82,7 +83,5 @@ public class CartItemService {
         cart.setTotalPrice(totalPriceOfCart);
         cartRepository.save(cart);
     }
-
-
 
 }
