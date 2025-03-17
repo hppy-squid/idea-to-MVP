@@ -5,6 +5,7 @@ import Idea.To.MVP.Exceptions.UserAlreadyExistException;
 import Idea.To.MVP.Exceptions.UserNotFoundException;
 import Idea.To.MVP.request.CreateUserReq;
 import Idea.To.MVP.Response.ApiResponse;
+import Idea.To.MVP.request.UpdateUserRequest;
 import Idea.To.MVP.service.UserService;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -71,6 +72,22 @@ public class UserController {
            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), false, null));
         } catch (ConstraintViolationException e) {
             return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse(e.getMessage(), false, null));
+        }
+    }
+
+    @PutMapping("/users/update/{userId}")
+    public ResponseEntity<ApiResponse> updateUser(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest req) {
+        try {
+            User updatedUser = userService.updateUser(userId, req);
+            UserDto userDto = userService.convertToDto(updatedUser);
+            return ResponseEntity.ok(new ApiResponse("User updated successfully", true, userDto));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), false, null));
+        } catch (UserAlreadyExistException e) {
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), false, null));
+        }catch (ConstraintViolationException e) {
+            return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse(e.getMessage(), false, null));
+
         }
     }
 

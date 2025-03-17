@@ -52,6 +52,7 @@ public class UserService{
                 }).orElseThrow(() -> new UserAlreadyExistException("There is already a user with this: " + createUserReq.getEmail() + " email"));
     }
 
+    @Transactional
     public User updateUser(UUID userId, UpdateUserRequest updateUserRequest) {
         return userRepository.findById(userId)
                 .map(user -> {
