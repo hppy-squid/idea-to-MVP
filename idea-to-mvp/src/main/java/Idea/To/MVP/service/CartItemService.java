@@ -72,6 +72,9 @@ public class CartItemService {
                     item.setAmount(amount);
                     item.setUnitPrice(item.getProduct().getPrice());
                     item.setTotalPrice();
+                    if (item.getAmount() == 0) {
+                        cart.getCartItems().remove(item);
+                    }
                 });
         BigDecimal totalPriceOfCart = cart.getCartItems().stream()
                 .map(CartItem::getTotalPrice)

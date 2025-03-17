@@ -30,7 +30,11 @@ public class CartItemController {
         try {
             //Detta måste ändras sen då vi kommer att ha autentiserade användare
             if (cartId == null) {
-                Cart cart = cartService.newCart(userId);
+                User user = userService.getUserById(userId);
+                Cart cart = user.getCart();
+                if (cart == null) {
+                    cart = cartService.newCart(userId);
+                }
                 cartId = cart.getId();
             }
             cartItemService.addProductToCart(cartId,productId,amount);

@@ -6,6 +6,8 @@ import Idea.To.MVP.Exceptions.UserNotFoundException;
 import Idea.To.MVP.request.CreateUserReq;
 import Idea.To.MVP.Response.ApiResponse;
 import Idea.To.MVP.service.UserService;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +17,7 @@ import Idea.To.MVP.models.User;
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -61,13 +62,15 @@ public class UserController {
 
 
     @PostMapping("/users/add")
-    public ResponseEntity<ApiResponse> createNewUser(@RequestBody CreateUserReq req) {
+    public ResponseEntity<ApiResponse> createNewUser(@Valid @RequestBody CreateUserReq req) {
         try {
             User user = userService.createUser(req);
             UserDto userDto = userService.convertToDto(user);
             return ResponseEntity.ok(new ApiResponse("User created successfully", true, userDto));
         } catch (UserAlreadyExistException e) {
            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), false, null));
+        } catch (ConstraintViolationException e) {
+            return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse(e.getMessage(), false, null));
         }
     }
 
