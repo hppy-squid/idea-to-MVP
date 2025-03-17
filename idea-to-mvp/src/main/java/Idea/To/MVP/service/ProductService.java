@@ -4,19 +4,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import Idea.To.MVP.Repository.ProductRepository;
 import Idea.To.MVP.models.Product;
+import lombok.AllArgsConstructor;
 
 @Transactional
 @Service
+@AllArgsConstructor
 public class ProductService {
 
-        @Autowired
-        ProductRepository productRepository;
+        private final ProductRepository productRepository;
+        private final StripeProductService stripeProductService;
+
 
         //     @Value("${stripe.secret.key}")
         // private String secretKey;
@@ -62,8 +64,8 @@ public class ProductService {
         public void addProduct(Product product) {
 
                 productRepository.save(product);
-                System.out.println("hej");
-        }
+                stripeProductService.syncProductsToStripe();
+                }
 
         public List<Product> getAllProducts() {
                return productRepository.findAll();
@@ -76,6 +78,7 @@ public class ProductService {
         public String deleteProductById(UUID id) {
                 if(getProductById(id) != null) {
                         productRepository.deleteById(id);
+                        stripeProductService.syncProductsToStripe();
                         return id + " Borttaget";
                 }
                 
@@ -84,28 +87,34 @@ public class ProductService {
 
 
         public Optional<Product> patchProductById(UUID id, Product product) {
-                
-                      return productRepository.findById(id)
-                      .map(existingProduct -> {
+                Optional<Product> updatedProduct = productRepository.findById(id)
+                    .map(existingProduct -> {
                         if (product.getName() != null) {
-                                existingProduct.setName(product.getName());
-                                }      
+                            existingProduct.setName(product.getName());
+                        }
                         if (product.getPrice() != null) {
-                                existingProduct.setPrice(product.getPrice());
-                                        }
+                            existingProduct.setPrice(product.getPrice());
+                        }
                         if (product.isInStock() != existingProduct.isInStock()) {
-                                existingProduct.setInStock(product.isInStock());
-                                }  
+                            existingProduct.setInStock(product.isInStock());
+                        }
                         if (product.getDescription() != null) {
-                                existingProduct.setDescription(product.getDescription());
-                                                        } 
+                            existingProduct.setDescription(product.getDescription());
+                        }
                         if (product.getOriginCountry() != null) {
-                                existingProduct.setOriginCountry(product.getOriginCountry());
-                                }
+                            existingProduct.setOriginCountry(product.getOriginCountry());
+                        }
                         if (product.getImage() != null) {
-                                existingProduct.setImage(product.getImage());
-                                }                                    
+                            existingProduct.setImage(product.getImage());
+                        }
+                        if (product.getRoastLevel() != null) { 
+                                existingProduct.setRoastLevel(product.getRoastLevel());
+                            }
                         return productRepository.save(existingProduct);
-                });  
-        }
+                    });
+                // om uppdatering lyckas så synkronisera med Stripe
+                updatedProduct.ifPresent(updated -> stripeProductService.syncProductsToStripe());
+                return updatedProduct;
+            }
+
 }

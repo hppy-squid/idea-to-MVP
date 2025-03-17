@@ -1,7 +1,9 @@
 package Idea.To.MVP.service;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,20 +22,39 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StripeUserService {
 
-        private final UserRepository userRepository;
-    List<String> stripeProductIds = new ArrayList<>();
+    private final UserRepository userRepository;
 
     @Value("${stripe.secret.key}")
     private String secretKey;
-    
 
     @PostConstruct
-    public void uploadUsersToStripe() {
+    // tar bort Stripe alla users som inte finns i databasen
+    public void syncUsersToStripe() {
 
         Stripe.apiKey = secretKey;
-        List<User> users = userRepository.findAll();
-        for (User user : users) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            // hämtar alla Stripe users, stripe kräver en Map för detta.
+            com.stripe.model.CustomerCollection stripeCustomers = Customer.list(params);
 
+            for (Customer stripeCustomer : stripeCustomers.getData()) {
+                String metadataId = stripeCustomer.getMetadata().get("id");
+                // kontrollerar om metadata saknas eller om ID inte längre finns
+                if (metadataId == null || !userRepository.existsById(UUID.fromString(metadataId))) {
+                    stripeCustomer.delete();
+                }
+            }
+        } catch (StripeException e) {
+            e.printStackTrace();
+        }
+        updateUsersWithNoStripeId();
+    }
+
+    // lägg till users utan stripeId i Stripe och lägg till ett stripeId.
+    private void updateUsersWithNoStripeId() {
+        List<User> users = userRepository.findAll();
+
+        for (User user : users) {
             if (user.getStripeId() == null || user.getStripeId().isEmpty()) {
                 try {
                     CustomerCreateParams params = CustomerCreateParams.builder()
@@ -53,7 +74,4 @@ public class StripeUserService {
             }
         }
     }
-
 }
-    
-
