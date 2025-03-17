@@ -17,6 +17,5 @@ public class UpdateUserRequest {
     private String email;
 
     @Size(min = 8, max = 100, message = "Password must be at least 8 characters long")
-    @NotBlank(message = "Password is required")
     private String password;
 }

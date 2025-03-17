@@ -43,6 +43,18 @@ public class SecurityConfig {
                             response.getWriter().write("{\"message\": \"Login failed: " + exception.getMessage() + "\", \"success\": false}");
                         })
                         .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/api/v1/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpStatus.OK.value());
+                            response.setContentType("application/json");
+                            response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+                            response.setHeader("Access-Control-Allow-Credentials", "true");
+                            response.getWriter().write("{\"message\": \"Logout successful\", \"success\": true}");
+                        })
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .maximumSessions(1))
