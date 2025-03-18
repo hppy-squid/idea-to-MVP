@@ -80,7 +80,7 @@ public class UserController {
     public ResponseEntity<ApiResponse> updateUser(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest req) {
         try {
 
-            userService.deleteUser(id);
+            userService.deleteUser(userId);
             stripeUserService.syncUsersToStripe();
 
             User updatedUser = userService.updateUser(userId, req);
