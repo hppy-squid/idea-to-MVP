@@ -5,6 +5,7 @@ import Idea.To.MVP.Exceptions.UserAlreadyExistException;
 import Idea.To.MVP.Exceptions.UserNotFoundException;
 import Idea.To.MVP.request.CreateUserReq;
 import Idea.To.MVP.Response.ApiResponse;
+import Idea.To.MVP.service.StripeUserService;
 import Idea.To.MVP.request.UpdateUserRequest;
 import Idea.To.MVP.service.UserService;
 import jakarta.validation.ConstraintViolationException;
@@ -26,6 +27,7 @@ import static org.springframework.http.HttpStatus.*;
 public class UserController {
 
     private final UserService userService;
+    private final StripeUserService stripeUserService;
 
     @GetMapping("/testUser")
     public ResponseEntity<User> getTestUser() {
@@ -33,15 +35,15 @@ public class UserController {
         User user = new User();
         user.setFirstName("test");
 
-        return ResponseEntity.ok(user); 
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/users/find")
     public ResponseEntity<ApiResponse> getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
-            List <UserDto> userDtos = users.stream()
-                    .map(userService :: convertToDto)
+            List<UserDto> userDtos = users.stream()
+                    .map(userService::convertToDto)
                     .toList();
             return ResponseEntity.ok(new ApiResponse("Users found successfully", true, userDtos));
         } catch (UserNotFoundException e) {
@@ -49,7 +51,7 @@ public class UserController {
         }
     }
 
-    @GetMapping ("/users/find/{id}")
+    @GetMapping("/users/find/{id}")
     public ResponseEntity<ApiResponse> getUserById(@PathVariable("id") UUID id) {
         try {
             User user = userService.getUserById(id);
@@ -60,16 +62,15 @@ public class UserController {
         }
     }
 
-
-
     @PostMapping("/users/add")
     public ResponseEntity<ApiResponse> createNewUser(@Valid @RequestBody CreateUserReq req) {
         try {
             User user = userService.createUser(req);
             UserDto userDto = userService.convertToDto(user);
+            stripeUserService.syncUsersToStripe();
             return ResponseEntity.ok(new ApiResponse("User created successfully", true, userDto));
         } catch (UserAlreadyExistException e) {
-           return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), false, null));
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), false, null));
         } catch (ConstraintViolationException e) {
             return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse(e.getMessage(), false, null));
         }
@@ -78,6 +79,10 @@ public class UserController {
     @PutMapping("/users/update/{userId}")
     public ResponseEntity<ApiResponse> updateUser(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest req) {
         try {
+
+            userService.deleteUser(id);
+            stripeUserService.syncUsersToStripe();
+
             User updatedUser = userService.updateUser(userId, req);
             UserDto userDto = userService.convertToDto(updatedUser);
             return ResponseEntity.ok(new ApiResponse("User updated successfully", true, userDto));
@@ -95,6 +100,7 @@ public class UserController {
     public ResponseEntity<ApiResponse> deleteUser(@PathVariable UUID userId) {
         try {
             userService.deleteUser(userId);
+
             return ResponseEntity.ok(new ApiResponse("User deleted successfully", true, null));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), false, null));

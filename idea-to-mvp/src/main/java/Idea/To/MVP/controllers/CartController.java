@@ -4,7 +4,6 @@ import Idea.To.MVP.DTO.CartDto;
 import Idea.To.MVP.Exceptions.CartNotFoundException;
 import Idea.To.MVP.Response.ApiResponse;
 import Idea.To.MVP.models.Cart;
-import Idea.To.MVP.models.User;
 import Idea.To.MVP.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

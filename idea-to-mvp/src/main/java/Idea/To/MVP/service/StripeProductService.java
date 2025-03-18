@@ -30,7 +30,7 @@ public class StripeProductService {
     private String secretKey;
 
 
-    public void removeUnusedProductsFromStripe() {
+    private void removeUnusedProductsFromStripe() {
         // Sätt API-nyckeln för Stripe
         Stripe.apiKey = secretKey;
 
@@ -62,7 +62,7 @@ public class StripeProductService {
     }
 
     @PostConstruct
-    public void uploadProductsToStripe() {
+    public void syncProductsToStripe() {
 
         Stripe.apiKey = secretKey;
         List<Product> products = productRepository.findAll();
@@ -100,7 +100,7 @@ public class StripeProductService {
     }
 
 
-    public void fetchProductsFromStripe() {
+    private void fetchProductsFromStripe() {
         // Sätt API-nyckeln
         Stripe.apiKey = secretKey;
 
