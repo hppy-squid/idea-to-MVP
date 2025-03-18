@@ -30,6 +30,12 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 40)
     private String lastName;
 
+    @Column(nullable = false)
+    private String adress;
+
+    @Column(nullable = false)
+    private String postCode;
+
 
     @Column(nullable = false)
     @Size(min = 4)

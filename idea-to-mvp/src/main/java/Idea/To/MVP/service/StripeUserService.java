@@ -50,6 +50,30 @@ public class StripeUserService {
         updateUsersWithNoStripeId();
     }
 
+    public void updateStripeCustomer(User user) throws StripeException {
+        Stripe.apiKey = secretKey;
+
+        Map<String, Object> customerParams = new HashMap<>();
+        customerParams.put("email", user.getEmail());
+        customerParams.put("name", user.getFirstName() + " " + user.getLastName());
+
+        // Address information
+        Map<String, Object> address = new HashMap<>();
+        address.put("line1", user.getAdress());
+        address.put("postal_code", user.getPostCode());
+        address.put("country", "SE"); // Sweden
+
+        customerParams.put("address", address);
+
+        // Add metadata
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("id", user.getId().toString());
+        customerParams.put("metadata", metadata);
+
+        Customer.retrieve(user.getStripeId()).update(customerParams);
+    }
+
+
     // lägg till users utan stripeId i Stripe och lägg till ett stripeId.
     private void updateUsersWithNoStripeId() {
         List<User> users = userRepository.findAll();
@@ -60,9 +84,13 @@ public class StripeUserService {
                     CustomerCreateParams params = CustomerCreateParams.builder()
                             .setName(user.getFirstName() + " " + user.getLastName())
                             .setEmail(user.getEmail())
+                            .setAddress(CustomerCreateParams.Address.builder()
+                                    .setLine1(user.getAdress())
+                                    .setPostalCode(user.getPostCode())
+                                    .setCountry("SE")
+                                    .build())
                             .putMetadata("id", String.valueOf(user.getId()))
                             .build();
-
                     Customer stripeCustomer = Customer.create(params);
                     user.setStripeId(stripeCustomer.getId());
                     userRepository.save(user);

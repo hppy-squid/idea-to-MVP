@@ -16,6 +16,12 @@ public class CreateUserReq {
     @NotBlank(message = "Email is required")
     private String email;
 
+    @NotBlank(message = "Adress is required")
+    private String adress;
+
+    @NotBlank(message = "Post code is required")
+    private String postCode;
+
     @Size(min = 8, max = 100, message = "Password must be at least 8 characters long")
     @NotBlank(message = "Password is required")
     private String password;

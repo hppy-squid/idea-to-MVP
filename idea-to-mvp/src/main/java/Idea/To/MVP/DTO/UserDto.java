@@ -12,6 +12,9 @@ public class UserDto {
     private String lastName;
     private String password;
     private String email;
+    private String adress;
+    private String postCode;
+
 
     private List<OrdersDto> orders;
     private CartDto cart;
