@@ -15,6 +15,8 @@ public class UserDetailService implements UserDetailsService {
     private final UserRepository userRepository;
 
 
+
+    //Laddar en användare baserat på deras mejladress
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)

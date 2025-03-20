@@ -22,11 +22,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // CORS med standardinställningar
                 .cors(Customizer.withDefaults())
+                // Inaktivera CSRF-skydd
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
+                        // Åtkomst till endpoints utan autentisering
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/loggedInUser").permitAll()
                         .anyRequest().permitAll())
+                // Spring Security formulär inloggning
                 .formLogin(form -> form
                         .loginProcessingUrl("/api/v1/auth/login")
                         .successHandler(successHandler)
@@ -43,6 +47,7 @@ public class SecurityConfig {
                             response.getWriter().write("{\"message\": \"Login failed: " + exception.getMessage() + "\", \"success\": false}");
                         })
                         .permitAll())
+                // Spring Security utloggning
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {

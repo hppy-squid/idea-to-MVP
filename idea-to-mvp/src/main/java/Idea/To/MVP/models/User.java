@@ -41,6 +41,7 @@ public class User implements UserDetails {
     @Size(min = 4)
     private String password;
 
+    // @Email validerar email adressen enligt en regex
     @Column(nullable = false, unique = true)
     @Email(
             regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}",

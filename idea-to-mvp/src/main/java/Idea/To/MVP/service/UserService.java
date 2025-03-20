@@ -29,6 +29,7 @@ public class UserService{
     private final PasswordEncoder passwordEncoder;
 
 
+    // Hämtar alla användare
     public List<User> getAllUsers() {
         List <User> users = userRepository.findAll();
         if (users.isEmpty()) {
@@ -37,11 +38,12 @@ public class UserService{
         return users;
     }
 
+    // Hämtar en användare baserat på Id
     public User getUserById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
     }
 
-
+    // Skapar en användare baserat på CreateUserReq
     public User createUser(CreateUserReq createUserReq) {
         return Optional.of(createUserReq).filter(user ->!userRepository.existsByEmail(user.getEmail()))
                 .map(createUserRequest -> {
@@ -56,6 +58,7 @@ public class UserService{
                 }).orElseThrow(() -> new UserAlreadyExistException("There is already a user with this: " + createUserReq.getEmail() + " email"));
     }
 
+    // Uppdaterar en användare baserat på UpdateUserReq
     @Transactional
     public User updateUser(UUID userId, UpdateUserRequest updateUserRequest) {
         return userRepository.findById(userId)
@@ -97,6 +100,7 @@ public class UserService{
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
     }
 
+    // TaR bort en användare
     @Transactional
     public void deleteUser(UUID id) {
         userRepository.findById(id).ifPresentOrElse(userRepository :: delete, () -> {
@@ -104,6 +108,7 @@ public class UserService{
         });
     }
 
+    // Authentiserar en användare
     @Transactional(readOnly = true)
     public User authenticateUser(String email) {
         User user = userRepository.findByEmail(email)
@@ -119,7 +124,7 @@ public class UserService{
         return user;
     }
 
-
+    // Konveraterar en användare till UserDto
     public UserDto convertToDto(User user) {
         return modelMapper.map(user, UserDto.class);
     }

@@ -23,18 +23,23 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+        // Hämta användarens e-postadress från autentiseringen
         String email = authentication.getName();
+        // Autentisera användaren med hjälp av e-postadressen
         User user = userService.authenticateUser(email);
+        // Konvertera användaren till en UserDto
         UserDto userDto = userService.convertToDto(user);
 
+        // Skapa ett ApiResponse-objekt för att skicka tillbaka som svar
         ApiResponse apiResponse = new ApiResponse(
                 "Login has been successful",
                 true,
                 userDto
         );
-
+        // Ställ in HTTP-statusen till OK (200)
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json");
+        // Ställ in CORS-rubriker
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));

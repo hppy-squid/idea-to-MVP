@@ -31,6 +31,7 @@ public class OrderService {
     private final ModelMapper modelMapper;
 
 
+    // Placerar en ny beställning. Ej implementerad men bra för vidareutveckling
     public Orders placeNewOrder (UUID userId) {
         Cart cart = cartService.getCartById(userId);
         Orders order = createNewOrder(cart);
@@ -47,6 +48,7 @@ public class OrderService {
         return savedOrder;
     }
 
+    // Bekräftar en stripe betalning. Ej implementerad men bra för vidareutveckling
     public Orders confirmStripePayment(String stripeSessionId) {
         Orders order  = ordersRepository.findByStripeSessionId(stripeSessionId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found for sessions " + stripeSessionId));
@@ -56,6 +58,7 @@ public class OrderService {
         return savedOrder;
     }
 
+    // räknar totalpriset av en order
     private BigDecimal totalPrice(List<OrderItem> orderItemsList) {
         return orderItemsList.stream()
                 .map(orderItem -> orderItem.getPrice()
@@ -63,6 +66,7 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    // Skapar orderItems
     private List<OrderItem> createOrderItems(Orders order, Cart cart) {
         return cart.getCartItems().stream()
                 .map(item -> {
@@ -73,6 +77,7 @@ public class OrderService {
                 }).toList();
     }
 
+    // Skapar en ny beställning
     private Orders createNewOrder(Cart cart) {
         Orders order = new Orders();
         order.setUser(cart.getUser());
@@ -81,12 +86,14 @@ public class OrderService {
         return order;
     }
 
+    // Hämtar en beställning baserat på ett Id
     public OrdersDto getOrderById(UUID orderId) {
         return ordersRepository.findById(orderId)
                 .map(this :: convertToDto)
                 .orElseThrow(()  -> new OrderNotFoundException("No order with this ID has been found"));
     }
 
+    // Hämtar en användares beställningar
     public List<OrdersDto> getAUsersOrders (UUID userId) {
         List<Orders> orders = ordersRepository.findByUserId(userId);
         return orders.stream().map(this :: convertToDto).toList();
