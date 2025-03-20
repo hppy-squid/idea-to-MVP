@@ -5,6 +5,9 @@
 ## Beskrivning
 Detta är backend-delen av ett e-handelsprojekt för kaffe, byggt med Spring Boot. Systemet hanterar användare, produkter, kundvagnar och betalningar via Stripe. Frontend projektet hittar ni här https://github.com/hppy-squid/frontend-MVP
 
+Github projects länk:  
+https://github.com/users/hppy-squid/projects/7
+
 Nedan är en länk till figma:  
 https://www.figma.com/design/5YYYdfksbNhKjqvOjisk4V/Figma-basics?node-id=1669-162202&p=f&t=WZt6S5zExG2xV6lr-0
 
