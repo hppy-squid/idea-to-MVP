@@ -27,6 +27,7 @@ public class CartService {
    private final ModelMapper modelMapper;
     private final UserService userService;
 
+    // Skapar en new cart
     public Cart newCart(UUID userId) {
         User user = userService.getUserById(userId);
         Cart cart = new Cart();
@@ -35,8 +36,9 @@ public class CartService {
         return cartRepository.save(cart);
    }
 
-   @Transactional
-public Cart getCartById(UUID id) {
+   // Hittar en kundvagn via ett id
+    @Transactional
+    public Cart getCartById(UUID id) {
     return cartRepository.findCartWithItemsById(id)
         .orElseThrow(() -> new CartNotFoundException("Cart with id: " + id + " not found"));
 }
@@ -49,6 +51,8 @@ public Cart getCartById(UUID id) {
        }
        return carts;
     }
+
+    // Tömmer en kundvagn
     @Transactional
     public void clearCart(UUID id) {
         Cart cart = getCartById(id);
@@ -62,11 +66,13 @@ public Cart getCartById(UUID id) {
         cartRepository.delete(cart);
     }
 
+    // Hämtar totalpriset av en kundvagn
     public BigDecimal getTotalPrice(UUID id) {
         Cart cart = getCartById(id);
         return cart.getTotalPrice();
     }
 
+    // Konverterar en kundvagn till en CartDTO
     @Transactional
     public CartDto convertToDto(Cart cart) {
         Hibernate.initialize(cart.getCartItems());

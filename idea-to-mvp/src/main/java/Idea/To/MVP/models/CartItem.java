@@ -33,6 +33,7 @@ public class CartItem {
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
+    // Sätt totalpriset baserat på enhetspriset och mängden
     public void setTotalPrice() {
         this.totalPrice = this.unitPrice.multiply(new BigDecimal(amount));
     }

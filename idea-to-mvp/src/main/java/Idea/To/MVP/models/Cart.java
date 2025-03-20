@@ -27,6 +27,8 @@ public class Cart {
     @JoinColumn(name = "user_id")
     private User user;
 
+
+    //  Lägg till en produkt i kundvagnen samt uppdaterar totalpriset
     public void addProductToCart(CartItem item) {
         this.cartItems.add(item);
         item.setCart(this);
@@ -34,17 +36,20 @@ public class Cart {
 
     }
 
+    // Tar bort en produkt från kundvagnen samt och uppdaterar totalpriset
     public void deleteItem(CartItem item) {
         this.cartItems.remove(item);
         item.setCart(null);
         updateTotalPrice();
     }
 
+    // Töm kundvagnen och uppdatera totalpriset
     public void clearCart() {
         this.cartItems.clear();
         updateTotalPrice();
     }
 
+    // Uppdatera totalpriset baserat på produkterna i kundvagnen
     private void updateTotalPrice() {
         this.totalPrice = this.cartItems.stream()
                 .map(item -> {
