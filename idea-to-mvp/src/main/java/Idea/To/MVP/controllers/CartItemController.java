@@ -24,11 +24,11 @@ public class CartItemController {
     private final CartService cartService;
     private final UserService userService;
 
+    //skapar en cart när en user lägger till produkt, sedan lägger till produkt
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addToCart(@RequestParam UUID productId, @RequestParam(required = false) UUID cartId,
                                                  @RequestParam Long amount, @RequestParam UUID userId) {
         try {
-            //Detta måste ändras sen då vi kommer att ha autentiserade användare
             if (cartId == null) {
                 User user = userService.getUserById(userId);
                 Cart cart = user.getCart();

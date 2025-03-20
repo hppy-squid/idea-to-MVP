@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class CheckoutController {
     
     private final StripeCheckoutService stripeCheckoutService;
-    
+    //checkout för stripe
     @PostMapping("/checkout/{userId}") 
         public ResponseEntity <String> checkout(@PathVariable UUID userId) {
 
@@ -28,7 +28,7 @@ public class CheckoutController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
-
+    //användaren får kvitto
     @GetMapping("/checkout/success")
     public void handleSuccess(@RequestParam("session_id") String sessionId, HttpServletResponse response) throws StripeException, IOException {
         String receiptUrl = stripeCheckoutService.getReceiptUrl(sessionId);

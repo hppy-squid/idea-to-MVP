@@ -21,6 +21,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping("/api/v1/order")
 public class OrderController {
 
+    //Denna klass är ej färdig, order är inte implementerat ännu.
     private final OrderService orderService;
     private final UserService userService;
 

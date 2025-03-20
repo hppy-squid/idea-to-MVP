@@ -16,9 +16,8 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @CrossOrigin(origins = {"http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:8080"}, allowCredentials = "true")
 public class AuthController {
 
+    //kontrollerar vilken user som är inloggad
     private final UserService userService;
-
-
 
     @GetMapping("/loggedInUser")
     public ResponseEntity<ApiResponse> getUser(Principal principal) {

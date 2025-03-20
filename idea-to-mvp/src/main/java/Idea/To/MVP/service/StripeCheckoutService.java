@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StripeCheckoutService {
 
+    //secretKey ligger i application.properties
     @Value("${stripe.secret.key}")
     private String secretKey;
 
@@ -35,7 +36,7 @@ public class StripeCheckoutService {
     public String createCheckoutSession(UUID userId) throws StripeException {
         Stripe.apiKey = secretKey;
 
-        // Hämta användaren och korgen
+        // Hämta användaren och inkorgen
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Cart cart = user.getCart();
@@ -43,20 +44,20 @@ public class StripeCheckoutService {
             throw new RuntimeException("Cart is empty");
         }
 
-        // Skapa LineItems-lista för Stripe Checkout
+        // Skapar en LineItems-lista för Stripe Checkout
         List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
 
         for (CartItem item : cart.getCartItems()) {
-            // Hämta produkten från Stripe
+            // Hämta alla produkter från Stripe
             Product stripeProduct = Product.retrieve(item.getProduct().getStripeId());
 
-            // Hämta `default_price` som skapades via `uploadProductsToStripe()`
+            // Hämta default_price som skapades via uploadProductsToStripe()
             String priceId = stripeProduct.getDefaultPrice();
             if (priceId == null) {
                 throw new RuntimeException("No default price found for product: " + item.getProduct().getName());
             }
 
-            // Skapa Stripe LineItem
+            // Skapa Stripe LineItem för varje produkt
             SessionCreateParams.LineItem lineItem = SessionCreateParams.LineItem.builder()
                     .setPrice(priceId)
                     .setQuantity(item.getAmount())
@@ -65,7 +66,7 @@ public class StripeCheckoutService {
             lineItems.add(lineItem);
         }
 
-        // Skapa Stripe Checkout-session
+        // Skapa Stripe Checkout-session med alla lineItems vi skapat
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .addAllLineItem(lineItems)
@@ -76,13 +77,14 @@ public class StripeCheckoutService {
 
         Session session = Session.create(params);
 
-        // Spara Stripe-session-ID i cart om du vill
+        // Spara Stripe-session-ID i cart
         cart.setStripeSessionId(session.getId());
         cartRepository.save(cart);
 
-        return session.getUrl(); // Returnera URL till Stripe Checkout
+        return session.getUrl(); // Returnera URL för att komma till Stripe Checkout
     }
 
+    //Hämtar/sparar Url till kvitto.
     public String getReceiptUrl(String sessionId) throws StripeException {
         Stripe.apiKey = secretKey;
 

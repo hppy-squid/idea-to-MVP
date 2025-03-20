@@ -27,21 +27,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // @PostMapping("/test-checkout")
-    // public Map<String, String> createCheckoutSession() {
-
-    // return productService.createCheckoutSession();
-    // }
-
-    // @GetMapping("/testProduct")
-    // public ResponseEntity<Product> getTestProduct() {
-
-    // Product product = new Product();
-    // product.setName("test");
-
-    // return ResponseEntity.ok(product);
-    // }
-
     @PostMapping("/product")
     public void addProduct(@RequestBody Product product) {
         productService.addProduct(product);
@@ -66,19 +51,5 @@ public class ProductController {
     @PatchMapping("/product")
     public Optional<Product> patchProductById(@RequestParam("id") UUID id, @RequestBody Product product) {
         return productService.patchProductById(id, product);
-    }
-
-    @PostMapping("/addTestProduct")
-    public ResponseEntity<Product> addTestProduct() {
-        Product product = new Product();
-        product.setName("Test Produkt");
-        product.setPrice(new BigDecimal(299));
-        product.setInStock(true);
-        product.setDescription("Detta är en test produkt");
-        product.setOriginCountry("Sweden");
-        product.setImage(null);
-
-        productService.addProduct(product);
-        return ResponseEntity.ok(product);
     }
 }

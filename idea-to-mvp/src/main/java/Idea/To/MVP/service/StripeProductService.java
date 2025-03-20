@@ -23,39 +23,44 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StripeProductService {
 
+    // Denna klassen synkar alla databasentiteter till Stripe dashboard. Den
+    // kontrollerar vad som finns/inte finns och uppdaterar. Uppdelat i tre nästlade
+    // metoder.
+
     private final ProductRepository productRepository;
     List<String> stripeProductIds = new ArrayList<>();
 
+    // secretKey ligger i application.properties
     @Value("${stripe.secret.key}")
     private String secretKey;
-
 
     private void removeUnusedProductsFromStripe() {
         // Sätt API-nyckeln för Stripe
         Stripe.apiKey = secretKey;
 
-        // Skapa parametrar, t.ex. ange ett maxantal om det behövs
+        // Skapa Map, behövs för att hämta alla produkter från Stripe.
         Map<String, Object> params = new HashMap<>();
 
         try {
             // Hämta produktlistan från Stripe
             com.stripe.model.ProductCollection productCollection = com.stripe.model.Product.list(params);
 
-            // Iterera igenom alla produkter och radera dem
+            // Iterera igenom alla produkter i Stripe och jämför med produkt id i databas,
+            // raderar id i metadata som inte finns i databas.
             productCollection.getData().forEach(product -> {
 
-                if (!productRepository.findAllById(List.of(UUID.fromString(product.getMetadata().get("id")))).iterator().hasNext()) {
+                if (!productRepository.findAllById(List.of(UUID.fromString(product.getMetadata().get("id")))).iterator()
+                        .hasNext()) {
                     try {
                         product.delete();
                     }
-                    
+
                     catch (StripeException e) {
-                       System.err.println("Kunde inte radera produkt : " + product.getId());
-                   }
+                        System.err.println("Kunde inte radera produkt : " + product.getId());
+                    }
                 }
-            });            
-        } 
-        catch (StripeException e) {
+            });
+        } catch (StripeException e) {
             System.err.println("Fel vid hämtning av Stripe produkter: " + e.getMessage());
             e.printStackTrace();
         }
@@ -65,30 +70,35 @@ public class StripeProductService {
     public void syncProductsToStripe() {
 
         Stripe.apiKey = secretKey;
+        // Hämtar alla produkter från databasen
         List<Product> products = productRepository.findAll();
         for (Product product : products) {
 
+            // Kontrollerar så produkten inte redan har ett Stripe-ID
             if (product.getStripeId() == null || product.getStripeId().isEmpty()) {
                 try {
-                    if (product.getPrice() != null) {                     
+                    if (product.getPrice() != null) {
+                        //konverterar priset till rätt enhet
                         long priceInSmallestUnit = product.getPrice()
-                    .multiply(new BigDecimal("100"))
-                    .longValueExact();
-                    ProductCreateParams params = ProductCreateParams.builder()
-                            .setName(product.getName())
-                            .setDescription(product.getDescription())
-                            .setDefaultPriceData(
-                         ProductCreateParams.DefaultPriceData.builder()
-                         .setCurrency("sek")        
-                         .setUnitAmount(priceInSmallestUnit)
-                             .build()
-                            )
-                    .putMetadata("id", String.valueOf(product.getId()))
-                            .build();
-
-                    com.stripe.model.Product stripeProduct = com.stripe.model.Product.create(params);
-                    product.setStripeId(stripeProduct.getId());
-                    productRepository.save(product);}
+                                .multiply(new BigDecimal("100"))
+                                .longValueExact();
+                        //lägger in värden för att skapa produkt på Stripe
+                        ProductCreateParams params = ProductCreateParams.builder()
+                                .setName(product.getName())
+                                .setDescription(product.getDescription())
+                                .setDefaultPriceData(
+                                        ProductCreateParams.DefaultPriceData.builder()
+                                                .setCurrency("sek")
+                                                .setUnitAmount(priceInSmallestUnit)
+                                                .build())
+                                .putMetadata("id", String.valueOf(product.getId()))
+                                .build();
+                        //Skapar produkten
+                        com.stripe.model.Product stripeProduct = com.stripe.model.Product.create(params);
+                        //Uppdaterar produkten så den sparar ett stripe id i databas
+                        product.setStripeId(stripeProduct.getId());
+                        productRepository.save(product);
+                    }
                 } catch (StripeException e) {
                     // Hantera fel, t.ex. logga problemet
                     System.err.println("Fel vid uppladdning av produkt: " + product.getName());
@@ -99,21 +109,18 @@ public class StripeProductService {
         fetchProductsFromStripe();
     }
 
-
     private void fetchProductsFromStripe() {
-        // Sätt API-nyckeln
         Stripe.apiKey = secretKey;
 
         try {
-            // Parametrar för listan, t.ex. sätt ett maxantal produkter
+            // Skapa Map, behövs för att hämta alla produkter från Stripe.
             Map<String, Object> params = new HashMap<>();
 
             // Hämta produktlistan från Stripe
             com.stripe.model.ProductCollection productCollection = com.stripe.model.Product.list(params);
 
-            // Iterera över produkterna
+            // Iterera genom produkterna
             for (com.stripe.model.Product stripeProduct : productCollection.getData()) {
-                // Här kan du t.ex. skriva ut produktens namn och id
                 List<String> metadataValues = new ArrayList<>(stripeProduct.getMetadata().values());
                 stripeProductIds.addAll(metadataValues);
                 // här tar vi bort produkter efter ID:s som inte finns
