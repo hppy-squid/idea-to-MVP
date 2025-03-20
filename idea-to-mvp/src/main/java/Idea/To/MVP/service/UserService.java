@@ -8,6 +8,7 @@ import Idea.To.MVP.Repository.UserRepository;
 import Idea.To.MVP.request.CreateUserReq;
 import Idea.To.MVP.models.User;
 import Idea.To.MVP.request.UpdateUserRequest;
+import com.stripe.exception.StripeException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,7 @@ public class UserService{
 
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+    private final StripeUserService stripeUserService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -48,6 +50,8 @@ public class UserService{
                     user.setLastName(createUserReq.getLastName());
                     user.setPassword(passwordEncoder.encode(createUserReq.getPassword()));
                     user.setEmail(createUserReq.getEmail());
+                    user.setPostCode(createUserReq.getPostCode());
+                    user.setAdress(createUserReq.getAdress());
                     return userRepository.save(user);
                 }).orElseThrow(() -> new UserAlreadyExistException("There is already a user with this: " + createUserReq.getEmail() + " email"));
     }
@@ -57,8 +61,8 @@ public class UserService{
         return userRepository.findById(userId)
                 .map(user -> {
                     if (updateUserRequest.getEmail() != null &&
-                        !updateUserRequest.getEmail().equals(user.getEmail()) &&
-                        userRepository.existsByEmail(updateUserRequest.getEmail())) {
+                            !updateUserRequest.getEmail().equals(user.getEmail()) &&
+                            userRepository.existsByEmail(updateUserRequest.getEmail())) {
                         throw new UserAlreadyExistException("Email already in use: " + updateUserRequest.getEmail());
                     }
                     if (updateUserRequest.getEmail() != null) {
@@ -70,10 +74,25 @@ public class UserService{
                     if (updateUserRequest.getLastName() != null) {
                         user.setLastName(updateUserRequest.getLastName());
                     }
+                    if (updateUserRequest.getAdress() != null) {
+                        user.setAdress(updateUserRequest.getAdress());
+                    }
+                    if (updateUserRequest.getPostCode() != null) {
+                        user.setPostCode(updateUserRequest.getPostCode());
+                    }
                     if (updateUserRequest.getPassword() != null) {
                         user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
                     }
-                    return userRepository.save(user);
+
+                    User updatedUser = userRepository.save(user);
+
+                    try {
+                        stripeUserService.updateStripeCustomer(updatedUser);
+                    } catch (StripeException e) {
+                        System.err.println("Failed to update Stripe customer: " + e.getMessage());
+                    }
+
+                    return updatedUser;
                 })
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
     }

@@ -70,6 +70,7 @@ public class StripeCheckoutService {
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .addAllLineItem(lineItems)
                 .setCustomer(user.getStripeId())
+                .setBillingAddressCollection(SessionCreateParams.BillingAddressCollection.REQUIRED)
                 .setSuccessUrl("http://localhost:8080/api/v1/checkout/success?session_id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl("http://127.0.0.1:5500/varukorg.html")
                 .build();

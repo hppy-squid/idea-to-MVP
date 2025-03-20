@@ -13,6 +13,10 @@ public class UpdateUserRequest {
     @Size(max = 40)
     private String lastName;
 
+    private String adress;
+
+    private String postCode;
+
     @Email(message = "Please provide a valid email")
     private String email;
 
