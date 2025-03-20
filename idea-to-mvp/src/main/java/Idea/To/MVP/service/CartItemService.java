@@ -22,6 +22,7 @@ public class CartItemService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
 
+    //hämtar cart från databas, lägger till produkt efter produktId. Kontrollerar om id finns innan den lägger till.
     public void addProductToCart (UUID cartId, UUID productId, Long amount) {
         Cart cart = cartService.getCartById(cartId);
         Product product = productService.getProductById(productId)
@@ -64,6 +65,7 @@ public class CartItemService {
         cartRepository.save(cart);
     }
 
+    //uppdaterar cartItem, om amount är noll så tas det bort.
     public void updateAmount (UUID cartId, UUID productId, long amount) {
         Cart cart = cartService.getCartById(cartId);
         cart.getCartItems().stream()

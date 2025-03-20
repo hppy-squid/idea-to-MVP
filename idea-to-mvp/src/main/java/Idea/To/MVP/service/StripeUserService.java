@@ -28,7 +28,7 @@ public class StripeUserService {
     private String secretKey;
 
     @PostConstruct
-    // tar bort Stripe alla users som inte finns i databasen
+    // tar bort alla Stripe users som inte finns i databasen
     public void syncUsersToStripe() {
 
         Stripe.apiKey = secretKey;

@@ -29,15 +29,6 @@ public class UserController {
     private final UserService userService;
     private final StripeUserService stripeUserService;
 
-    @GetMapping("/testUser")
-    public ResponseEntity<User> getTestUser() {
-
-        User user = new User();
-        user.setFirstName("test");
-
-        return ResponseEntity.ok(user);
-    }
-
     @GetMapping("/users/find")
     public ResponseEntity<ApiResponse> getAllUsers() {
         try {

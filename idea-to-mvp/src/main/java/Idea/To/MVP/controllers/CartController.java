@@ -22,14 +22,6 @@ public class CartController {
 
     private final CartService cartService;
 
-
-    //Detta är bara för att testa att det fungerar. Cart kommer att skapas egentligen när vi skapar ett cart item
-    //I CartItemController
-    @PostMapping("/new")
-    public Cart newCartTest(UUID userId) {
-        return cartService.newCart(userId);
-    }
-
     @GetMapping("/get/{id}")
     public ResponseEntity<ApiResponse> getCartById(@PathVariable("id") String uuid) {
         try {
